@@ -186,7 +186,7 @@ class MyHomePageState extends State<MyHomePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.red,
                           ),
                           child: IconButton(
@@ -206,7 +206,7 @@ class MyHomePageState extends State<MyHomePage> {
                           width: 5,
                         ),
                         Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.green,
                           ),
                           child: IconButton(
