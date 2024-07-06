@@ -81,8 +81,20 @@ class MyHomePageState extends State<MyHomePage> {
     double cambio = _totalPago - cobrar;
 
     if (cambio < 0) {
+      List<String> faltanteImagenes = [];
+      double faltante = -cambio;
+
+      for (var denominacion in _denominaciones) {
+        while (faltante >= denominacion['valor']) {
+          faltanteImagenes.add(denominacion['imagen']);
+          faltante -= denominacion['valor'];
+          faltante = double.parse(
+              faltante.toStringAsFixed(2)); // Evitar problemas de precisión
+        }
+      }
+
       setState(() {
-        _resultado = ['El pago es insuficiente.'];
+        _resultado = ['El pago es insuficiente. Falta:'] + faltanteImagenes;
       });
       return;
     }
@@ -195,16 +207,12 @@ class MyHomePageState extends State<MyHomePage> {
                             onPressed: () => _quitarPago(index),
                           ),
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
+                        const SizedBox(width: 5),
                         Text(
                           '${_contadores[index]}',
                           style: const TextStyle(fontSize: 20),
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
+                        const SizedBox(width: 5),
                         Container(
                           decoration: const BoxDecoration(
                             color: Colors.green,
@@ -256,14 +264,33 @@ class MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 20),
             _resultado.isNotEmpty
-                ? _resultado[0] == 'El pago es insuficiente.' ||
+                ? _resultado[0].startsWith('El pago es insuficiente.') ||
                         _resultado[0] ==
                             'Por favor, ingrese la cantidad a cobrar.' ||
                         _resultado[0] ==
                             'Formato de cantidad a cobrar inválido.'
-                    ? Text(
-                        _resultado[0],
-                        style: const TextStyle(fontSize: 18, color: Colors.red),
+                    ? Column(
+                        children: [
+                          Text(
+                            _resultado[0],
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.red),
+                          ),
+                          Wrap(
+                            children: _resultado
+                                .sublist(1)
+                                .map((imgPath) => Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Image.asset(
+                                        imgPath,
+                                        width: 150,
+                                        height: 75,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ))
+                                .toList(),
+                          )
+                        ],
                       )
                     : SingleChildScrollView(
                         child: Column(
