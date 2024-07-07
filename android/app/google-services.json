@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "9320623273",
+    "project_id": "carniceria-amin",
+    "storage_bucket": "carniceria-amin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:9320623273:android:665ee5e71a2ddef7ac0db8",
+        "android_client_info": {
+          "package_name": "com.example.cambio_facil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiDtkuNj9NSH7tngWroQqAmSqJAvSHZaw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

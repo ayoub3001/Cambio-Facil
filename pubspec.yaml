@@ -38,6 +38,9 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   wakelock: ^0.6.2
   audioplayers: ^5.2.1
+  firebase_core: ^2.24.2
+  flutter_barcode_scanner: ^2.0.0
+  firebase_database: ^10.4.0
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +83,8 @@ flutter:
     - assets/images/50_euro.png
     - assets/images/logo.png
     - assets/sounds/sonido_clic.mp3
+    - assets/sounds/sound_scanner.mp3
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
