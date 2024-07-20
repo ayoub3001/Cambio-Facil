@@ -21,10 +21,11 @@ class PageEscanerState extends State<PageEscaner> {
     app: Firebase.app(),
     databaseURL:
         'https://carniceria-amin-default-rtdb.europe-west1.firebasedatabase.app',
-  ).ref().child('productos');
+  ).ref().child(codeDB).child("Productos");
+
+  Map<String, Map<String, String>> existingProducts = {};
 
   String barcode = "No hay código escaneado.";
-  Map<String, Map<String, String>> existingProducts = {};
 
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -268,61 +269,108 @@ class PageEscanerState extends State<PageEscaner> {
   double calculateProductPrice(Map<String, String> productInfo) {
     double unitPrice = double.parse(productInfo['price']!.replaceAll('€', ''));
     int quantity = int.parse(productInfo['quantity']!);
-    if (productInfo['offer'] == '1x1€') {
-      return unitPrice * quantity; // Mostrar precio por unidad sin oferta
-    } else {
-      // Aplicar lógica de oferta
-      if (productInfo['offer'] != 'N/A') {
-        List<String> offerDetails = productInfo['offer']!.split('x');
-        int offerQuantity = int.parse(offerDetails[0]);
-        double offerPrice = double.parse(offerDetails[1].replaceAll('€', ''));
-        int offerBundles = quantity ~/ offerQuantity;
-        int remainingItems = quantity % offerQuantity;
-        return (offerBundles * offerPrice) + (remainingItems * unitPrice);
-      } else {
-        return unitPrice * quantity; // Sin oferta
-      }
+
+    // Si no existe la key 'offer' o su valor es 'N/A', simplemente multiplicamos el precio unitario por la cantidad
+    if (!productInfo.containsKey('offer') || productInfo['offer'] == 'N/A') {
+      return unitPrice * quantity;
     }
+
+    // Si hay una oferta, la aplicamos
+    List<String> offerDetails = productInfo['offer']!.split('x');
+    int offerQuantity = int.parse(offerDetails[0]);
+    double offerPrice = double.parse(offerDetails[1].replaceAll('€', ''));
+
+    int offerBundles = quantity ~/ offerQuantity;
+    int remainingItems = quantity % offerQuantity;
+
+    return (offerBundles * offerPrice) + (remainingItems * unitPrice);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Escanear Producto'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const RegistroProductos(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.app_registration),
-          ),
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Container(
+              margin: const EdgeInsets.only(
+                top: 20,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "ESCANEAR PRODUCTO",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Container(
+                    color: Colors.purple,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegistroProductos(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.app_registration,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: 1.0,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.purple,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: scanBarcode,
-                  child: const Text('Escanear Código de Barras'),
+                Expanded(
+                    child: GestureDetector(
+                  onTap: scanBarcode,
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                      ),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: Colors.purple,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: const Text(
+                        'Escanear Código de Barras',
+                        style: TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      )),
+                )),
+                const SizedBox(
+                  width: 20,
                 ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                  onPressed: scanBarcodeForRemoval,
-                  child: const Text('Eliminar'),
+                Expanded(
+                  child: GestureDetector(
+                      onTap: scanBarcodeForRemoval,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                        ),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: const Text('Eliminar producto',
+                            style: TextStyle(color: Colors.white),
+                            textAlign: TextAlign.center),
+                      )),
                 ),
               ],
             ),
@@ -381,12 +429,20 @@ class PageEscanerState extends State<PageEscaner> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                GestureDetector(
+                  onTap: removeAllProducts,
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.red),
+                    child: const Text(
+                      'Eliminar Todo',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  onPressed: removeAllProducts,
-                  child: const Text('Eliminar Todo'),
                 ),
                 Text(
                   'Total: ${calculateTotal().toStringAsFixed(2)}€',

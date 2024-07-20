@@ -79,14 +79,23 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Calculadora de Cambio'),
-      ),
       body: SingleChildScrollView(
         controller: _scrollController,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                  margin: const EdgeInsets.only(top: 30),
+                  child: const Text(
+                    "CALCULADORA CAMBIOS",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  )),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
             const Align(
               alignment: Alignment.centerLeft,
               child: Text("Total Productos: "),
@@ -157,7 +166,10 @@ class MyHomePageState extends State<MyHomePage> {
                             color: Colors.green,
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.add),
+                            icon: const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
                             color: Colors.white,
                             onPressed: () => _agregarPago(index),
                           ),
@@ -173,32 +185,64 @@ class MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _calcularCambio,
-                    icon: const Icon(Icons.calculate),
-                    label: const Text('Calcular'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      textStyle: const TextStyle(fontSize: 20),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
+                    child: GestureDetector(
+                  onTap: _calcularCambio,
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.calculate,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Calcular",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        )
+                      ],
                     ),
                   ),
+                )),
+                const SizedBox(
+                  width: 10,
                 ),
-                const SizedBox(width: 10),
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _resetear,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Resetear'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      textStyle: const TextStyle(fontSize: 20),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
+                    child: GestureDetector(
+                  onTap: _resetear,
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.refresh,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Resetear",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        )
+                      ],
                     ),
                   ),
-                ),
+                )),
               ],
             ),
             const SizedBox(height: 20),

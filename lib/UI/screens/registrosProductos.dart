@@ -6,6 +6,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:audioplayers/audioplayers.dart';
 
+import '../../Domain/Data/variables.dart';
+
 class RegistroProductos extends StatefulWidget {
   const RegistroProductos({super.key});
 
@@ -20,12 +22,13 @@ class RegistroProductosState extends State<RegistroProductos> {
   String _barcode = "";
   final Map<String, List<String>> _products = {};
   final Map<String, List<String>> _existingProducts = {};
+  bool _isLoading = false;
 
   final DatabaseReference _dbRef = FirebaseDatabase.instanceFor(
     app: Firebase.app(),
     databaseURL:
         'https://carniceria-amin-default-rtdb.europe-west1.firebasedatabase.app',
-  ).ref().child('productos');
+  ).ref().child(codeDB).child("Productos");
 
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -96,6 +99,10 @@ class RegistroProductosState extends State<RegistroProductos> {
   }
 
   Future<void> sendToRealtimeDatabase() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     await fetchExistingProducts();
     for (var barcode in _products.keys) {
       if (_existingProducts.containsKey(barcode)) {
@@ -120,6 +127,7 @@ class RegistroProductosState extends State<RegistroProductos> {
     }
     setState(() {
       _products.clear();
+      _isLoading = false;
     });
 
     // Mostrar un AlertDialog al subir los datos exitosamente
@@ -152,94 +160,150 @@ class RegistroProductosState extends State<RegistroProductos> {
       appBar: AppBar(
         title: const Text('Registro de Productos'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              ElevatedButton(
-                onPressed: scanBarcode,
-                child: const Text('Escanear Código de Barras'),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                _barcode.isNotEmpty
-                    ? 'Código escaneado: $_barcode'
-                    : 'No hay código escaneado.',
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              TextField(
-                controller: _nameController,
-                decoration:
-                    const InputDecoration(labelText: 'Nombre del Producto'),
-              ),
-              TextField(
-                controller: _priceController,
-                decoration:
-                    const InputDecoration(labelText: 'Precio del Producto'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: _offerController,
-                decoration:
-                    const InputDecoration(labelText: 'Oferta (Ej: 3x1€, 2x1€)'),
-              ),
-              const SizedBox(height: 10),
-              Row(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: saveProduct,
-                      child: const Text('Guardar Producto'),
+                  GestureDetector(
+                    onTap: scanBarcode,
+                    child: Container(
+                      alignment: Alignment.center,
+                      margin: const EdgeInsets.symmetric(horizontal: 35),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.purple),
+                      child: const Text(
+                        "Escanear código de barras",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: clearProduct,
-                      child: const Text('Borrar Datos'),
+                  const SizedBox(height: 10),
+                  Text(
+                    _barcode.isNotEmpty
+                        ? 'Código escaneado: $_barcode'
+                        : 'No hay código escaneado.',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  TextField(
+                    controller: _nameController,
+                    decoration:
+                        const InputDecoration(labelText: 'Nombre del Producto'),
+                  ),
+                  TextField(
+                    controller: _priceController,
+                    decoration:
+                        const InputDecoration(labelText: 'Precio del Producto'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  TextField(
+                    controller: _offerController,
+                    decoration: const InputDecoration(
+                        labelText: 'Oferta (Ej: 3x1€, 2x1€)'),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: saveProduct,
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: const Text(
+                              "Guardar producto",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: clearProduct,
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: const Text(
+                              "Borrar Datos",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 200,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black, width: 1.0),
+                      ),
+                      child: ListView.separated(
+                        itemCount: _products.length,
+                        itemBuilder: (context, index) {
+                          String barcode = _products.keys.elementAt(index);
+                          String name = _products[barcode]![0];
+                          String price = _products[barcode]![1];
+                          String offer = _products[barcode]![2];
+                          return ListTile(
+                            title: Text(
+                                '$name: $price ; $barcode ; Oferta: $offer'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => deleteProduct(barcode),
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, index) => const Divider(
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: sendToRealtimeDatabase,
+                    child: Container(
+                      alignment: Alignment.center,
+                      margin: const EdgeInsets.symmetric(horizontal: 35),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.purple),
+                      child: const Text(
+                        "Enviar a la Base de Datos",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 200,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black, width: 1.0),
-                  ),
-                  child: ListView.separated(
-                    itemCount: _products.length,
-                    itemBuilder: (context, index) {
-                      String barcode = _products.keys.elementAt(index);
-                      String name = _products[barcode]![0];
-                      String price = _products[barcode]![1];
-                      String offer = _products[barcode]![2];
-                      return ListTile(
-                        title:
-                            Text('$name: $price ; $barcode ; Oferta: $offer'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => deleteProduct(barcode),
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, index) => const Divider(
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: sendToRealtimeDatabase,
-                child: const Text('Enviar a Realtime Database'),
-              ),
-            ],
+            ),
           ),
-        ),
+          if (_isLoading)
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
+        ],
       ),
     );
   }
