@@ -13,14 +13,8 @@ Esta aplicación ha sido creada para ayudar a las personas a gestionar la devolu
 
 ## Requisitos
 
-- Dispositivo móvil con sistema operativo Android/iOS.
+- Dispositivo móvil con sistema operativo Android.
 - Conexión a Internet (para funciones de escaneo y registro).
-
-## Instalación
-
-1. Descarga la aplicación desde [Google Play Store](#) o [Apple App Store](#).
-2. Abre la app y sigue las instrucciones en pantalla para configurar tu cuenta.
-3. Comienza a disfrutar de una experiencia de compra más sencilla.
 
 ## Cómo Usar
 
