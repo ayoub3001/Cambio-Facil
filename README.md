@@ -38,12 +38,8 @@ Esta aplicación ha sido creada para ayudar a las personas a gestionar la devolu
 
 Si deseas contribuir al desarrollo de esta aplicación, no dudes en abrir un issue o enviar un pull request. ¡Tu ayuda es bienvenida!
 
-## Licencia
-
-Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
-
 ## Contacto
 
-Para preguntas, sugerencias o más información, puedes contactarnos en [tu-email@example.com].
+Para preguntas, sugerencias o más información, puedes contactarnos en work.ayoub07@gmail.com
 
 ¡Esperamos que disfrutes de nuestra app y que te ayude en tu día a día!
